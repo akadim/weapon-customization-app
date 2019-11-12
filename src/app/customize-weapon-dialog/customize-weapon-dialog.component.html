@@ -1,0 +1,59 @@
+<mat-toolbar color="primary">
+    <span>Customize Your Weapon</span>
+</mat-toolbar>
+
+<form [className]="'weapon-customization-form'">
+    <mat-form-field class="field-full-width">
+        <input matInput placeholder="Weapon's name" value="Sushi">
+    </mat-form-field>
+    <mat-grid-list cols="3" rowHeight="100px">
+        <mat-grid-tile>
+            <mat-form-field>
+                <mat-label>Weapon Type</mat-label>
+                <mat-select>
+                  <mat-option *ngFor="let weaponType of weaponTypes" [value]="weaponType.value">
+                    {{weaponType.title}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field> 
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-form-field>
+                <mat-label>Weapon Optics</mat-label>
+                <mat-select class="field-full-width">
+                  <mat-option *ngFor="let weaponOptic of weaponOptics" [value]="weaponOptic.value">
+                    {{weaponOptic.title}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field> 
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-form-field>
+                <mat-label>Weapon Ammunition</mat-label>
+                <mat-select>
+                  <mat-option *ngFor="let weaponAmmunition of weaponAmmunitions" [value]="weaponAmmunition.value">
+                    {{weaponAmmunition.title}}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field> 
+        </mat-grid-tile>
+      </mat-grid-list>
+      <mat-grid-list cols="5" rowHeight="100px">
+        <mat-grid-tile>
+            <img *ngIf="selectedWeaponType" src="{{ selectedWeaponType ? selectedWeaponType.image : '' }}" alt="{{selectedWeaponType.title}}" style="width: 90%; height: 90%"/> 
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <span class="add-gadget-icon"> + </span>
+        </mat-grid-tile>
+        <mat-grid-tile>
+          <img *ngIf="selectedWeaponOptic" src="{{ selectedWeaponOptic.image}}" alt="{{selectedWeaponOptic.title}}" style="width: 90%; height: 90%"/>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <span class="add-gadget-icon"> + </span>
+        </mat-grid-tile>
+        <mat-grid-tile>
+          <img *ngIf="selectedWeaponAmmunition" src="{{selectedWeaponAmmunition.image}}" alt="{{selectedWeaponAmmunition.title}}" style="width: 90%; height: 90%"/>
+        </mat-grid-tile>
+      </mat-grid-list>
+      <button mat-raised-button color="primary">VALIDATE THIS WEAPON CUSTOMIZATION</button>
+</form>

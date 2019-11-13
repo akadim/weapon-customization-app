@@ -3,20 +3,24 @@
 }
 
 .add-gadget-icon {
-    font-size: 30px;
+    font-size: 35px;
     font-weight: bold;
     border: 1px solid black;
     border-radius: 50%;
     color: white;
     background: black;
-    padding: 5px;
+    padding: 5px 10px;
 }
 
 .weapon-customization-form {
-    margin-top: 10px;
+    margin-top: 20px;
+}
+
+.form-actions {
+    padding: 0px 30px;
 }
 
 .mat-raised-button {
-    width: 100%;
-    margin: 10px 0px;
+    width: 45%;
+    margin: 10px 5px;
 }

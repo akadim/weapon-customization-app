@@ -8,7 +8,8 @@ import { WeaponConfiguration } from './weapon-configuration';
 import { WeaponArsenal } from './weapon-arsenal';
 import { map, switchMap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-customize-weapon-dialog',
@@ -17,15 +18,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class CustomizeWeaponDialogComponent implements OnInit {
   
-  /* Weapon Types list */ 
-  weaponTypes: WeaponType[];
-
-  /* Weapon Optics list */
-  weaponOptics: WeaponOptic[];
-
-  /* Weapon Ammunitions List */
-  weaponAmmunitions: WeaponAmmunition[];
-
   /* Weapon Configuration */
   weaponConfiguration: WeaponConfiguration;
 
@@ -38,18 +30,28 @@ export class CustomizeWeaponDialogComponent implements OnInit {
 
   weaponForm: FormGroup;
 
+  breakpointImage: number;
+  breakpointSelect: number;
+
   @ViewChild('weaponTypeImage', { static: false }) weaponTypeImage: ElementRef;
   @ViewChild('weaponOpticImage', { static: false }) weaponOpticImage: ElementRef;
   @ViewChild('weaponAmmunitionImage', { static: false }) weaponAmmunitionImage: ElementRef;
 
   
 
-  constructor(private customizeWeaponService: CustomizeWeaponServiceService, private formBuilder: FormBuilder) { }
+  constructor(
+     private customizeWeaponService: CustomizeWeaponServiceService, 
+     private formBuilder: FormBuilder,
+     private toastr: ToastrService
+     ) { }
 
   ngOnInit() {
+
+   this.breakpointImage = (window.innerWidth <= 400) ? 1 : 5;
+   this.breakpointSelect = (window.innerWidth <= 400) ? 1 : 3;
     
    this.weaponForm = this.formBuilder.group({
-      name: [''],
+      name: ['', Validators.required],
       type: [''],
       optic: [''],
       ammunition: ['']
@@ -84,7 +86,7 @@ export class CustomizeWeaponDialogComponent implements OnInit {
             });
 
             this.weaponForm = this.formBuilder.group({
-               name: [this.weaponConfiguration.name],
+               name: [this.weaponConfiguration.name, Validators.required],
                type: [this.weaponConfiguration.type],
                optic: [this.weaponConfiguration.optic],
                ammunition: [this.weaponConfiguration.ammunition]
@@ -93,6 +95,11 @@ export class CustomizeWeaponDialogComponent implements OnInit {
      });
 
   }
+
+  onResize(event) {
+      this.breakpointImage = (event.target.innerWidth <= 400) ? 1 : 5;
+      this.breakpointSelect = (event.target.innerWidth <= 800) ? 1 : 3;
+   }
 
   onChangeWeaponType(event) {
      let id = parseInt(event.value);
@@ -105,20 +112,50 @@ export class CustomizeWeaponDialogComponent implements OnInit {
   onChangeWeaponOptic(event) {
       let id = parseInt(event.value);
 
-      this.customizeWeaponService.getWeaponOptic(id).subscribe( (weaponType) => {
-         this.weaponOpticImage.nativeElement.src = environment.apiUrl + '/images/weapon-optics/' + weaponType.image;
+      this.customizeWeaponService.getWeaponOptic(id).subscribe( (weaponOptic) => {
+         this.weaponOpticImage.nativeElement.src = environment.apiUrl + '/images/weapon-optics/' + weaponOptic.image;
       });
    }
 
    onChangeWeaponAmmunition(event) {
       let id = parseInt(event.value);
 
-      this.customizeWeaponService.getWeaponAmmunition(id).subscribe( (weaponType) => {
-         this.weaponAmmunitionImage.nativeElement.src = environment.apiUrl + '/images/weapon-ammunitions/' + weaponType.image;
+      this.customizeWeaponService.getWeaponAmmunition(id).subscribe( (weaponAmmunition) => {
+         this.weaponAmmunitionImage.nativeElement.src = environment.apiUrl + '/images/weapon-ammunitions/' + weaponAmmunition.image;
       });
    }
 
    onSubmit() {
-       console.log(this.weaponForm.value);
+       this.customizeWeaponService.updateWeaponConfiguration(this.weaponForm.value).subscribe( (response) => {
+            
+            console.log("Weapon Configuration Name = " + response.name + "[Weapon = "+response['type']['title']+", Optic = "+ response['optic']['title'] +", Ammunition = " + response['ammunition']['title'] + "]");
+
+            this.weaponConfiguration = {
+               name: response.name,
+               type: response['type']['id'],
+               optic: response['optic']['id'],
+               ammunition: response['ammunition']['id']
+            };
+
+            this.toastr.success('the Weapon is Successfully Upgraded, Check the console for more infos', 'Success!');
+       });
+   }
+
+   onCancel() {
+
+      const weaponType = this.weaponArsenal.weaponTypes.find((weaponType) => weaponType.id === this.weaponConfiguration.type );
+      const weaponOptic = this.weaponArsenal.weaponOptics.find((weaponOptic) => weaponOptic.id === this.weaponConfiguration.optic );
+      const weaponAmmunition = this.weaponArsenal.weaponAmmunitions.find((weaponAmmunition) => weaponAmmunition.id === this.weaponConfiguration.ammunition );
+
+      this.weaponTypeImage.nativeElement.src =  (weaponType.image.indexOf('http') < 0) ? environment.apiUrl + '/images/weapon-types/' + weaponType.image :  weaponType.image;
+      this.weaponOpticImage.nativeElement.src = (weaponOptic.image.indexOf('http') < 0) ? environment.apiUrl + '/images/weapon-optics/' + weaponOptic.image : weaponOptic.image;
+      this.weaponAmmunitionImage.nativeElement.src = (weaponAmmunition.image.indexOf('http') < 0) ? environment.apiUrl + '/images/weapon-ammunitions/' + weaponAmmunition.image : weaponAmmunition.image;
+
+      this.weaponForm = this.formBuilder.group({
+         name: [this.weaponConfiguration.name, Validators.required],
+         type: [this.weaponConfiguration.type],
+         optic: [this.weaponConfiguration.optic],
+         ammunition: [this.weaponConfiguration.ammunition]
+      });
    }
 }

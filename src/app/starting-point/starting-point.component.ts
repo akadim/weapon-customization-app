@@ -16,7 +16,8 @@ export class StartingPointComponent implements OnInit {
 
   openDialog() {
     let WeaponDialog = this.dialog.open(CustomizeWeaponDialogComponent, {
-        width: '800px'
+        width: '800px',
+        height: '470px'
     });
   }
 

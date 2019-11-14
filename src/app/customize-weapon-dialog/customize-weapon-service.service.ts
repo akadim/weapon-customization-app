@@ -38,4 +38,8 @@ export class CustomizeWeaponServiceService {
   getWeaponAmmunition(id: number): Observable<WeaponAmmunition> {
     return this.http.get<WeaponAmmunition>(environment.apiUrl + '/weapon-ammunition/'+ id);
   }
+
+  updateWeaponConfiguration(weaponConfiguration: WeaponConfiguration): Observable<WeaponConfiguration> {
+     return this.http.put<WeaponConfiguration>(environment.apiUrl + '/weapon-configuration', weaponConfiguration, this.httpOptions);
+  }
 }

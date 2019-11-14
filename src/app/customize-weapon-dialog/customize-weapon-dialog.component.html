@@ -4,9 +4,9 @@
 
 <form [className]="'weapon-customization-form'" [formGroup]="weaponForm" (ngSubmit)="onSubmit()" method="post">
     <mat-form-field class="field-full-width">
-        <input matInput placeholder="Weapon's name" value="" formControlName="name">
+        <input matInput placeholder="Weapon's Configuration name" value="" formControlName="name">
     </mat-form-field>
-    <mat-grid-list cols="5" rowHeight="100px" >
+    <mat-grid-list rowHeight="100px" [cols]="breakpointImage" (window:resize)="onResize($event)">
         <mat-grid-tile>
             <img #weaponTypeImage *ngIf="selectedWeaponType" src="{{ selectedWeaponType ? selectedWeaponType.image : '' }}" alt="{{selectedWeaponType.title}}" style="width: 90%; height: 90%"/> 
         </mat-grid-tile>
@@ -23,7 +23,7 @@
           <img #weaponAmmunitionImage *ngIf="selectedWeaponAmmunition" src="{{selectedWeaponAmmunition.image}}" alt="{{selectedWeaponAmmunition.title}}" style="width: 90%; height: 90%"/>
         </mat-grid-tile>
     </mat-grid-list>
-    <mat-grid-list cols="3" rowHeight="100px" [style.background]="'lightblue'" *ngIf="weaponArsenal">
+    <mat-grid-list [cols]="breakpointSelect" rowHeight="100px" [style.background]="'lightblue'" *ngIf="weaponArsenal" (window:resize)="onResize($event)">
         <mat-grid-tile>
             <mat-form-field>
                 <mat-label>Weapon Type</mat-label>
@@ -56,7 +56,7 @@
         </mat-grid-tile>
       </mat-grid-list>
       <div [className]="'form-actions'">
-        <button mat-raised-button color="primary" type="submit">CONFIRM</button>
-        <button mat-raised-button color="warn">CANCEL</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!weaponForm.valid">CONFIRM</button>
+        <button mat-raised-button color="warn" type="button" (click)="onCancel()">CANCEL</button>
       </div>
 </form>
